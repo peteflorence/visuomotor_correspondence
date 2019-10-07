@@ -6,5 +6,7 @@ This is the code used for our paper "Self-Supervised Correspondence in Visuomoto
 
 Without documentation, this code will not be of much use to try and actually use.
 
-We've open-sourced it so we can more easily point people to it as reference.
+We've open-sourced it sooner-than-later so we can more easily point people to it as reference.
+
+Soon we will have documentation.  Stay tuned!
 
