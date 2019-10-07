@@ -1,0 +1,39 @@
+# input
+use_vision: False
+
+action:
+  type: "ee_velocity_cmd_world_frame"
+  config: {}
+
+observation:
+  type: "ee_position_history_observation"
+  config:
+      history: [0, -3, -6, -9, -12]
+      ee_points:
+        - [1.0, 0, 0]
+        - [0, 1.0, 0]
+        - [0, 0, 1.0]
+
+model:
+  vision_net: none # DonSpatialSoftmax
+  descriptor_net: "/home/manuelli/data/pdc/trained_models/imitation/sugar_box_3/010001.pth"
+  policy_net: "mlp_stateless"
+  config:
+    units_per_layer: [50, 50]
+    num_inputs: 45
+    num_outputs: 6
+    num_ref_descriptors: 32
+
+
+# training params
+global_training_steps: 12000
+batch_size: 1                 # needs to be 1 if sequence
+lr: 1.0e-2
+momentum: 0.9
+alpha:    0.9                 # for RMSprop
+save_rate_iteration: 1000
+learning_rate_decay: 0.5
+steps_between_learning_rate_decay: 1500
+clip_grad_norm: 1.0           # if controller_type is sequence
+num_workers: 12
+sigma_noise_augmentation: 0.02

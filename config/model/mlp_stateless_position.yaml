@@ -1,0 +1,128 @@
+num_downsampled_logs: 50
+
+use_vision: True
+camera_num: 0
+use_depth: False
+use_3D_unprojection: False
+precompute_features: False
+freeze_vision: False
+
+regression_type: "direct"
+num_gaussians:   2
+
+# training params
+global_training_steps: 50000
+batch_size: 16                 # needs to be 1 if sequence
+lr: 1.0e-4
+weight_decay: 0.0e-4
+momentum: 0.9
+alpha:    0.9                 # for RMSprop
+save_rate_iteration: 10000 
+learning_rate_decay: 0.5
+steps_between_learning_rate_decay: 10000
+num_workers: 12
+sigma_noise_augmentation: 0.006
+divide_by_std: True
+action_bias: 0
+test_loss_rate_iterations: 1000
+position_noise_augmentation_sigma: 0.001 # meters
+rotation_noise_augmentation_sigma: 1.0 # degrees, will be angle-axis
+
+# filters out indices with little movement
+filtering:
+  filter_no_movement: False
+  translation_threshold: 0.001
+  rotation_threshold_degrees: 1.0 # degrees
+  gripper_width_threshold: 0.01
+
+# observation:
+#   type: ""
+#   config:
+#     translation:
+#       x: True
+#       y: True
+#       z: True
+#     quaternion:
+#       w: False
+#       x: False
+#       y: False
+#       z: False
+#     rpy:
+#       roll: False
+#       pitch: False
+#       yaw: False
+#     gripper:
+#       force: False
+#       speed: False
+#       width: False
+#     object_pose_cheat_data:
+#       translation: False
+#       quaternion: False
+
+observation:
+  type: "ee_position_history_observation"
+  config:
+      history: [0]
+      ee_points:
+        - [0.0, 0, 0]
+#        - [0, 0.1, 0]
+#        - [0, 0, 0.1]
+      angle_axis_relative_to_nominal:
+        x: False
+        y: False
+        z: False
+      gripper:
+        width: False
+
+# output
+action:
+  type: ""
+  config:
+    translation:
+      x: False
+      y: False
+      z: False
+    rpy:
+      roll:  False
+      pitch: False
+      yaw:   False
+    quaternion: False
+    translation_delta:
+      x: False
+      y: False
+      z: False
+    translation_delta_world_frame:
+      x: True
+      y: True
+      z: True
+    angle_axis_delta: # in gripper frame
+      x: False
+      y: False
+      z: False
+    angle_axis_relative_to_nominal:
+      x: False
+      y: False
+      z: False
+    gripper:
+      width: False
+
+
+model:
+  vision_net: DonSpatialSoftmax # none, DonSpatialSoftmax, SpatialAutoencoder, EndToEnd
+  #descriptor_net: "/home/peteflo/data/pdc/trained_models/imitation/sugar_spatial_0710_3/010000.pth"
+  descriptor_net: "/home/peteflo/data/pdc/trained_models/imitation/sugar_flip_spatial_0716_augmented_3/010000.pth"
+  #descriptor_net: "/home/peteflo/data/pdc/trained_models/imitation/sugar_flip_spatial_0716_3/010000.pth"
+  #autoencoder_net: "/home/peteflo/spartan/modules/imitation_agent/model/2019-07-15-02-02-44/dsae_0.pth"
+  #descriptor_net: "/home/peteflo/data/pdc/trained_models/imitation/sugar_spatial_longer_3/010002.pth"
+  policy_net: "mlp_stateless"
+  config:
+    units_per_layer: [64, 64]
+    dropout_prob: 0.2
+    num_ref_descriptors: 1     # this needs to match for both DonSpatialSoftmax and SpatialAutoencoder
+    use_xyz_passthrough_every_layer: False
+
+
+# ONLY FOR ANALYSIS
+use_gt_object_pose: False
+project_pose_into_camera: False
+single_camera_num_for_projection: 0

@@ -1,0 +1,158 @@
+# for historical reasons we accidentally used this T_W_Enominal
+T_W_Enominal: [[-0.00714052,  0.38309528,  0.92368123,  0.7636582 ], 
+               [ 0.02952701,  0.92338278, -0.38274324, -0.01763667], 
+               [-0.99953848,  0.02454056, -0.01790509,  0.23705875], 
+               [ 0.        ,  0.        ,  0.        ,  1.        ]]
+
+use_vision: True
+camera_num: 0
+use_depth: False
+
+use_soft_3D_unprojection: False
+use_hard_3D_unprojection: False
+precompute_features: True
+precompute_descriptor_images: False
+freeze_vision: True
+surf_descriptors: False
+
+regression_type: "direct"
+num_gaussians:   2
+
+# training params
+global_training_steps: 200000
+batch_size: 1                 # needs to be 1 if sequence
+lr: 2.0e-3
+momentum: 0.9
+alpha:    0.9                 # for RMSprop
+save_rate_iteration: 5000 
+learning_rate_decay: 0.75
+steps_between_learning_rate_decay: 40000
+clip_grad_norm: 1.0           # if controller_type is sequence
+num_workers: 4
+truncated_backprop_length: 50 # if controller_type is sequence
+sigma_noise_augmentation: 0.006
+temporal_augmentation: False
+shift_augmentation: False
+shift_augmentation_sigma: 0.01
+action_bias: 5
+test_loss_rate_iterations: 5000
+
+position_noise_augmentation_sigma: 0.005 # meters
+rotation_noise_augmentation_sigma: 1.0 # degrees, will be angle-axis
+
+#position_noise_augmentation_sigma: 0.00 # meters
+#rotation_noise_augmentation_sigma: 0.0 # degrees, will be angle-axis
+
+# dataset params
+num_slices: 6
+
+# filters out indices with little movement
+filtering:
+  filter_no_movement: True
+  translation_threshold: 0.001
+  rotation_threshold_degrees: 1.0 # degrees
+  gripper_width_threshold: 0.01
+
+
+observation:
+  type: "ee_position_history_observation"
+  config:
+      history: [0]
+      ee_points:
+        - [0.0, 0, 0]
+        #- [0, 0.1, 0]
+        #- [0, 0, 0.1]
+      angle_axis_relative_to_nominal:
+        x: False
+        y: False
+        z: False
+      gripper:
+        width: False
+      # use_dynamic_gt_object_pose:
+      #   translation:
+      #     x: False
+      #     y: False
+      #     z: False
+      #   angle_axis_relative_to_nominal:
+      #     y: False
+      #     x: False
+      #     z: False
+      # # gt_object_points:
+      # #    - [0.0, 0.0, 0.0] 
+      # #    - [0.0, 0.1, 0.0]
+      # #    - [0.0, 0.0, 0.1]
+      # project_gt_object_points_into_camera: False
+
+
+# output
+action:
+  type: ""
+  config:
+    translation:
+      x: False
+      y: False
+      z: False
+    rpy:
+      roll:  False
+      pitch: False
+      yaw:   False
+    quaternion: False
+    translation_delta:
+      x: False
+      y: False
+      z: False
+    translation_delta_world_frame:
+      x: True
+      y: True
+      z: False
+    angle_axis_delta: # in gripper frame
+      x: False
+      y: False
+      z: False
+    angle_axis_relative_to_nominal:
+      x: False
+      y: False
+      z: False
+    gripper:
+      width: False
+
+loss_scaling: [1.0, 1.0]
+
+model:
+
+  vision_net: DonSpatialSoftmax # (none, DonSpatialSoftmax, SpatialAutoencoder)
+  #descriptor_net: "/home/peteflo/data/pdc/trained_models/imitation/sugar_spatial_0710_3/010000.pth"
+
+  descriptor_net: "/home/peteflo/data/pdc/trained_models/imitation/real_sugar_push_box_10/010000.pth"
+  #descriptor_net: "/home/peteflo/data/pdc/trained_models/imitation/real_right_boot_se2_10/010000.pth"
+
+  #descriptor_net: "/home/peteflo/data/pdc/trained_models/imitation/push_box_spatial_3/007000.pth"
+  #reference_vec: "/home/peteflo/data/pdc/imitation/features/push_box_spatial_3/000/reference_descriptors.pth"
+
+  # descriptor_net: "/home/peteflo/data/pdc/trained_models/imitation/push_box_spatial_moremasked_3d_3_continue2/010000.pth"
+  # reference_vec: "/home/peteflo/data/pdc/imitation/features/push_box_spatial_moremasked_3d_3_continue2/000/reference_descriptors.pth"
+
+  #descriptor_net: "/home/peteflo/data/pdc/trained_models/imitation/push_box_spatial_3d_10_cam1onlyScaled/015000.pth"
+  #descriptor_net: "/home/peteflo/data/pdc/trained_models/imitation/push_box_spatial_3d_3_cam1only/015000.pth"
+
+  #descriptor_net: "/home/peteflo/data/pdc/trained_models/imitation/real_many_shoes_ssoftmax_3/006000.pth"
+  #descriptor_net: "/home/peteflo/data/pdc/trained_models/imitation/real_many_shoes_spatial_3/010001.pth"
+  #descriptor_net: "/home/peteflo/data/pdc/trained_models/imitation/sugar_spatial_longer_3/010002.pth"
+
+  policy_net: "LSTM_standard"
+  config:
+    MLP_SIZE: 100
+    RNN_CELL_SIZE: 100
+    RNN_layers: 1
+    RNN_bypass: False
+    USE_RNN: True
+    USE_MLP: True
+    dropout_prob_MLP: 0.1
+    dropout_prob_LSTM: 0.5
+    num_ref_descriptors: 16
+    use_xyz_passthrough: False
+
+
+# ONLY FOR ANALYSIS
+use_gt_object_pose: False
+project_pose_into_camera: False

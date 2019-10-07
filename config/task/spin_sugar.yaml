@@ -1,0 +1,4 @@
+logs:
+- "2019-06-13-13-30-42"
+#- "2019-06-13-13-31-41" this one is very long
+#- "2019-06-13-13-33-14" this one has a corrupted start

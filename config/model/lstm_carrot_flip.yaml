@@ -1,0 +1,124 @@
+use_vision: True
+camera_num: 0
+use_depth: False
+use_3D_unprojection: False
+precompute_features: True
+freeze_vision: True
+
+regression_type: "MDN" # direct, MDN
+num_gaussians:   5
+
+# training params
+global_training_steps: 200000
+batch_size: 1                 # needs to be 1 if sequence
+lr: 2.0e-3
+momentum: 0.9
+alpha:    0.9                 # for RMSprop
+save_rate_iteration: 5000 
+learning_rate_decay: 0.75
+steps_between_learning_rate_decay: 40000
+clip_grad_norm: 1.0           # if controller_type is sequence
+num_workers: 12
+truncated_backprop_length: 50 # if controller_type is sequence
+sigma_noise_augmentation: 0.006
+temporal_augmentation: False
+shift_augmentation: False
+shift_augmentation_sigma: 0.01
+action_bias: 2
+test_loss_rate_iterations: 1000
+
+position_noise_augmentation_sigma: 0.003 # meters
+rotation_noise_augmentation_sigma: 0.5 # degrees, will be angle-axis
+
+# dataset params
+num_slices: 3
+
+# filters out indices with little movement
+filtering:
+  filter_no_movement: True
+  translation_threshold: 0.001
+  rotation_threshold_degrees: 1.0 # degrees
+  gripper_width_threshold: 0.01
+
+
+
+observation:
+  type: "ee_position_history_observation"
+  config:
+      history: [0]
+      ee_points:
+        - [0.0, 0, 0]
+#        - [0, 0.1, 0]
+#        - [0, 0, 0.1]
+      angle_axis_relative_to_nominal:
+        x: False
+        y: True
+        z: False
+      gripper:
+        width: False
+
+# output
+action:
+  type: ""
+  config:
+    translation:
+      x: False
+      y: False
+      z: False
+    rpy:
+      roll:  False
+      pitch: False
+      yaw:   False
+    quaternion: False
+    translation_delta:
+      x: False
+      y: False
+      z: False
+    translation_delta_world_frame:
+      x: False
+      y: True
+      z: True
+    angle_axis_delta: # in gripper frame
+      x: False
+      y: False
+      z: False
+    angle_axis_relative_to_nominal:
+      x: False
+      y: True
+      z: False
+    gripper:
+      width: False
+
+#loss_scaling: [1.0, 1.0, 1.0, 0.1, 0.1, 0.1]
+loss_scaling: [1.0, 1.0, 0.1]
+
+model:
+
+  vision_net: DonSpatialSoftmax # (none, DonSpatialSoftmax, SpatialAutoencoder, EndToEnd)
+  #descriptor_net: "/home/peteflo/data/pdc/trained_models/imitation/sugar_spatial_0710_3/010000.pth"
+  #descriptor_net: "/home/peteflo/data/pdc/trained_models/imitation/sugar_flip_spatial_0716_3/010000.pth"
+  #descriptor_net: "/home/peteflo/data/pdc/trained_models/imitation/real_many_shoes_ssoftmax_3/006000.pth"
+  #descriptor_net: "/home/peteflo/data/pdc/trained_models/imitation/real_many_shoes_spatial_3/010001.pth"
+  #descriptor_net: "/home/peteflo/data/pdc/trained_models/imitation/real_right_boot_ssoftmax_3/007000.pth"
+  descriptor_net: "/home/peteflo/data/pdc/trained_models/imitation/carrot_flips_ssoftmax_augmented_3/010000.pth"
+  #descriptor_net: "/home/peteflo/data/pdc/trained_models/imitation/sugar_spatial_longer_3/010002.pth"
+  #descriptor_net: "/home/peteflo/data/pdc/trained_models/imitation/empty_bag_ssoftmax_3/004000.pth"
+
+  policy_net: "LSTM_standard"
+  config:
+    MLP_SIZE: 100
+    RNN_CELL_SIZE: 32
+    RNN_layers: 1
+    RNN_bypass: False
+    USE_RNN: True
+    USE_MLP: True
+    dropout_prob_MLP: 0.1
+    dropout_prob_LSTM: 0.5
+    num_ref_descriptors: 8
+    use_xyz_passthrough: False
+
+
+# ONLY FOR ANALYSIS
+use_gt_object_pose: False
+project_pose_into_camera: False
+single_camera_num_for_projection: 0

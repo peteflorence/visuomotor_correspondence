@@ -1,0 +1,5 @@
+logs:
+- "2019-04-10-22-12-43"  # good but has some movement in x, not at origin in x
+#- "2019-04-24-18-27-25" # weird start
+#- "2019-04-24-18-26-44"
+don: "/home/peteflo/data/pdc/trained_models/imitation/sugar_spatial_longer_3/010002.pth"
